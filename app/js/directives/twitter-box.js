@@ -8,6 +8,10 @@ app.directive('twitterBox', ['$timeout', function ($timeout) {
    
     'use strict';
 
+    var isTouchDevice = function () {
+		return !!('ontouchstart' in window);
+	};
+
 	return {
 		restrict: 'A',
 		link: function (scope, element, attrs) {
@@ -71,6 +75,10 @@ app.directive('twitterBox', ['$timeout', function ($timeout) {
 
 				else if ($window.outerWidth() > 1024) { options.width = 320; }
 				showTwitter('twitter', options);
+
+				if (isTouchDevice()) {
+					$window.off('resize', alignTwitterBox);
+				}
 			};
 			
 			$window.on('resize', alignTwitterBox);

@@ -61,7 +61,7 @@ header.main-header {
 
 		h2 { text-align: center; font-family: 'Bad Script', cursive; @include formatText(27px, 73px, 700, $blue); }
 
-		p { width: 80%; margin: 0 auto; text-align: center; font-style: italic; color: rgba(0,0,0,0.7); }
+		p { width: 80%; margin: 0 auto; text-align: center; font-style: italic; color: rgba(0,0,0,0.7); padding-bottom: 25px; }
 	}
 }
 
@@ -103,7 +103,7 @@ footer.main-footer {
 	.map { max-width: 620px; height: 320px; margin: 77px auto 0 auto; }
 
 	p {
-		text-align: center; line-height: 50px;
+		text-align: center; margin-top: 20px;
 		
 		span { color: #4c66a4; }
 	}
@@ -207,4 +207,6 @@ footer.main-footer {
  	}
 
  	.skills ul { width: 250px; }
+
+ 	.contact p span { display: block; }
 }
