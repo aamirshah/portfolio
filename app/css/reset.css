@@ -1,0 +1,65 @@
+
+
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td, 
+header, footer, article, section, aside,  
+hgroup, menu, nav, figure,
+time, mark, audio, video{
+	margin:0;
+	padding:0;
+	border:0;
+	outline:none;
+	font-size:100%;
+	background:transparent;
+	vertical-align:baseline;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+a:hover, a:visited, a:active, a:link{outline:none;}
+
+/* HTML5 tags set to display block */
+header, footer, article, section, hgroup, nav, aside, figure{ 
+	display:block;
+}
+
+input, select{vertical-align:middle; outline:none;}
+
+ol, ul{list-style:none;}
+
+table{border-collapse:collapse; border-spacing:0;}
+
+.tableCell{display:table-cell; vertical-align:middle;}
+
+
+
+/* iframe-img*/
+iframe, img{border:none;}
+
+
+
+.clearfix:before, .clearfix:after{content:" "; display:table; clear:both;}
+
+
+.hide{display:none;}
+
+
+/* Text-Indent set to -999em*/
+.indent{text-indent:-999em !important;}
+
+
+.blocked { opacity:0.3; }
+
+
+	

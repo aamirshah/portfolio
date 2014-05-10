@@ -1,0 +1,210 @@
+
+section { background-color: $bgColor; }
+
+.box {
+	border: 3px solid $boderColor; border-bottom: 2px solid $boderColor;
+	border-radius: 5px; background: $white;
+}
+
+header.main-header {
+	height: 50px; max-width: 960px; margin-top: 10px;
+
+	nav {
+		padding: 0 10px; margin: 0 auto; height: inherit; background-color: $blue; color: $white;
+		-webkit-box-shadow: 0 3px 3px -3px gray;
+		-moz-box-shadow: 0 3px 3px -3px gray;
+		box-shadow: 0 3px 3px -3px gray;
+
+		.left {
+			float: left;
+
+			h2 { text-indent: 22px; @include formatText(22px, 43px, lighter); }
+		}
+
+		.right {
+			float: right;
+
+			ul {
+				line-height: 50px; font-weight: 700;
+
+				li {
+					display: inline-block; padding-left: 10px;
+
+					&:first-child { padding-left: 0; }
+
+					a {
+						color: $white; text-decoration: none; cursor: pointer;
+
+						&.active { border-bottom: 2px solid #fff; }
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+.main-area {
+	
+	float: left; max-width: 630px; min-height: 500px; border-radius: 5px; background: $white;
+	border: 3px solid $boderColor; border-bottom: 2px solid $boderColor;
+	
+	.pic {
+		width: 200px; height: 200px; border-radius: 50%; background: url('../images/aamir-profile.jpg');		
+		background-size: cover; border: 2px solid $blue; margin: 20px auto 0 auto;	
+	}
+
+	.details {
+
+		h1 { text-align: center; @include formatText(24px, 40px, normal, #000); }
+
+		h2 { text-align: center; font-family: 'Bad Script', cursive; @include formatText(27px, 73px, 700, $blue); }
+
+		p { width: 80%; margin: 0 auto; text-align: center; font-style: italic; color: rgba(0,0,0,0.7); }
+	}
+}
+
+.twitter-feed {
+
+	float: right; min-width: 320px; max-width: 520; height: 500px; border: 2px solid rgba(0, 0, 0, 0.15);
+	border-radius: 5px; text-align: center;
+	
+	a { line-height: 5em; }
+}
+
+
+
+footer.main-footer {
+
+	margin: 20px 0; background-color: #fff; width: inherit;
+	border-top: 3px solid rgba(0,0,0,0.15);
+	border-top-color: #4c66a4;
+	border-bottom: 2px solid rgba(0,0,0,0.15);
+
+	ul {
+		text-align: center; padding-top: 19px;
+		
+		li {
+			font-size: 32px; color: rgba(0,0,0,0.8); display: inline-block; padding-left: 20px; cursor: pointer;
+
+			&:first-child { padding-left: 0; }
+			&:hover { color: #4c66a4; }
+		}
+	}
+
+	h6 { color: rgba(0,0,0,0.65); text-align: center; font-size: 13px; line-height: 36px; }
+}
+
+
+.contact {
+	min-height: 500px;
+
+	.map { max-width: 620px; height: 320px; margin: 77px auto 0 auto; }
+
+	p {
+		text-align: center; line-height: 50px;
+		
+		span { color: #4c66a4; }
+	}
+}
+
+.title {
+	@include formatText(27px, 73px, normal, $blue);
+	text-align: center; font-family: 'Bad Script', cursive;
+}
+
+.skills {
+	min-height: 500px;
+
+	ul {
+		width: 400px; margin: 20px auto 0 auto;
+
+		.js { max-width: 90%; }
+		.html { max-width: 80%; }
+		.css { max-width: 75%; }
+		.ng { max-width: 95%;}
+		.jq { max-width: 90%; }
+		.responsive { max-width: 88%; }
+
+		li {			
+			height: 50px; background-color: rgba(0, 0, 0, 0.8); position:relative; color: #fff;
+			text-indent: 5px; line-height: 50px; margin-top: 5px;
+			animation:mymove 2s;
+			-webkit-animation:mymove 2s; /* Safari and Chrome */
+
+			i { font-size: 25px; padding-right: 10px; }
+		}
+	}
+}
+
+
+.no-select {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+
+
+@keyframes mymove
+{
+	from {width:0%;}
+	to {width: 100%;}
+}
+
+@-webkit-keyframes mymove /* Safari and Chrome */
+{
+	from {width:0%;}
+	to {width: 100%;}
+}
+/***********************************************************************************************************/
+
+
+/* #### Tablets Portrait or Landscape #### */
+@media screen and (min-width: 768px) and (max-width: 1024px){
+ 
+}
+
+@media screen and (min-width: 480px) and (max-width: 1024px){
+ 
+ 	.main-area { float: none; margin: 0 auto; }
+
+ 	.twitter-feed { float: none; margin: 0 auto; margin-top: 22px; max-width: 520px; }
+}
+
+
+
+/* #### Tablets Portrait or Landscape #### */
+@media screen and (min-width: 320px) and (max-width: 480px){
+ 
+ 	.wrapper { width: 90%; margin: 0 auto; }
+ 	.main-area {
+ 		float: none; margin: 0 auto;
+
+ 		.details {
+			h2 { font-size: 18px; }
+		}
+ 	}
+
+	.twitter-feed {
+		float: none; margin: 0 auto; margin-top: 22px; max-width: 260px; min-width: 260px;
+	}
+ 	
+ 	header.main-header nav {
+		text-align: center;
+
+		.left { display: none; }
+
+		.right { float: none; }
+ 	}
+
+ 	footer.main-footer ul li {
+ 		padding-left: 0;
+ 		font-size: 25px;
+ 	}
+
+ 	.skills ul { width: 250px; }
+}

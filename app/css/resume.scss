@@ -1,0 +1,213 @@
+
+
+.resume {
+
+	width: 960px; margin: 0 auto; background: $white; min-height: 500px; color: $black;
+
+	.wrapper { width: 90%; margin: 0 auto; }
+
+	header {
+		padding-top: 30px; border-bottom: 1px solid $boderColor;
+		
+		.name {
+			float: left; padding: 20px;
+
+			.logo { 
+				width: 50px; height: 50px; text-align: center; float: left; box-shadow: inset 0 0 0 50px $blue;
+				@include formatText(30px, 50px, normal, $white);
+			}
+
+			.inner-wrapper {
+				display: inline-block; padding-left: 17px; margin-top: 7px;
+
+				h1 { @include formatText(22px, 22px, lighter); }
+				h6 { @include formatText(13px, 13px, lighter); }	
+			}
+		}
+
+
+		.details {
+			float: right; margin-top: 20px;
+
+			ul {
+				width: 415px;
+
+				li { 
+					display: inline-block;
+					&:nth-child(odd) { padding-right: 10px; width: 210px; margin-top: 5px; }
+				}
+			}
+		}
+	}
+
+	article {
+
+		.intro {
+
+			margin-top: 50px;
+
+			.experience {
+
+				.timeline { margin-top: 10px;  ul { padding-top: 25px; } }
+
+				float: left; height: 300px; width: 250px;
+
+				h6 { @include formatText(12px, 12px, lighter); text-indent: 36px; margin-top: -6px; }
+			}
+
+			.summary { 
+				display: inline-block; width: 575px; text-align: justify; padding-left: 30px;
+				
+				p { margin-top: 20px; }
+			}
+		}
+
+		.row {
+			margin-top: 30px;
+
+			&.last { margin-top: 100px; padding-bottom: 50px; }
+
+			> div { float: left; }
+
+			.skillset {
+
+				ul {
+					width: 244px;
+
+					li {
+						position: relative; height: 30px; margin-top: 3px; text-indent: 2px;
+						@include formatText(14px, 22px, lighter);
+
+						span.actual { box-shadow: inset 0 0 0 5px $blue; z-index: 1; }
+
+						span.js { width: 90%; }
+						span.css { width: 80%; }
+						span.html { width: 85%; }
+						span.ng { width: 92%; }
+						span.jq { width: 81%; }
+						span.rb { width: 85%; }
+
+						span {
+							position: absolute; bottom: 0; left: 0; width: 100%; height: 10px;
+							 border-radius: 11px;
+							 box-shadow: inset 0 0 0 5px #e9eaed;
+						}
+					}
+				}
+			}
+
+			.tools {
+				margin-left: 28px;
+
+				ul {
+					padding-left: 10px; margin-top: 4px;
+
+					li {
+						line-height: 24px;
+					}
+				}
+			}
+
+
+			.education {
+				margin-left: 150px;
+
+				.timeline { 
+					width: 300px;
+
+					ul li:first-child { height: 28px; }
+				}
+			}
+
+			.profile {
+				width: 244px;
+
+				.quote {
+					font-size: 12px; font-style: italic; margin-top: 20px;
+
+					span { display: block; text-align: right; font-weight: bold; }
+				}
+
+				.details {
+
+					margin-top: 10px;
+
+					img { float: left; border-radius: 50%; max-width: 70px; max-height: 70px; margin-right: 10px; }
+
+					.connect {
+						display: inline-block; width: 153px; font-size: 15px; font-style: italic;
+
+						h4 { font-weight: lighter; text-indent: 5px; }
+
+						ul {
+							padding-top: 5px;
+							text-align: left;
+							li { display: inline-block; }
+						}
+
+						h6 { @include formatText(12px, 25px, lighter); }
+					}
+				}
+			}
+
+			.activities {
+				margin-left: 120px;
+
+				ul {
+					width: 320px;
+
+					li {
+						display: inline-block;
+						width: 75px;
+						height: 50px;
+						font-size: 12px;
+						text-align: center;
+						padding-right: 18px;
+						padding-top: 12px;
+
+						i {
+							font-size: 36px;
+						}
+
+						i.icon-chrome { font-size: 32px; }
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+.r-head {
+	@include formatText(22px, 40px, lighter);
+
+	i { padding-right: 5px; }
+}
+
+
+
+sup {
+	vertical-align: super;
+	font-size: smaller;
+	margin-left: -2px;
+}
+
+
+@media print {
+
+	body.white { background: #fff; }
+	.resume {
+
+		header .name .logo { text-shadow: 1px 0px #fff; color: #fff; z-index: 99;}
+
+		header { padding-top: 60px; }
+
+		article {
+			.intro { margin-top: 80px; }
+			.row { margin-top: 50px; }
+		}
+	}
+}

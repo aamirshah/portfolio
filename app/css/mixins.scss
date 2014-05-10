@@ -1,0 +1,15 @@
+$blue: #4c66a4;
+$bgColor: #e9eaed;
+$boderColor: rgba(0, 0, 0, 0.15);
+$white: #fff;
+$black: #303030;
+
+
+
+
+@mixin formatText($fontSize, $lineHeight, $fontWeight:normal, $color:inherit){
+	font-size: $fontSize;
+	line-height: $lineHeight;
+	font-weight: $fontWeight;
+	color: $color;
+}

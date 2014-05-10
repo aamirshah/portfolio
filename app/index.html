@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <title>Aamir Shah | Web Developer | JS Enthusiast</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1" />
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="images/aamir-profile.jpg" type="image/x-icon" />
+    <link href='http://fonts.googleapis.com/css?family=Bad+Script' rel='stylesheet' type='text/css'>
+  </head>
+
+  <body ng-app="aamir" class="outer-wrapper">
+
+    <header class="main-header">
+        <nav>
+            <div class="left">
+                <h2>www.shahaamir.com</h2>
+            </div>
+
+            <div class="right">
+                <ul>
+
+                    <li><a ng-class="{active: routeName == 'home'}" href="#/home">Home</a></li>
+                    <li><a ng-class="{active: routeName == 'skills'}" href="#/skills">Skills</a></li>
+                    <li><a ng-class="{active: routeName == 'resume'}" href="/resume.html" target="_blank">Resume</a></li>
+                    <li><a ng-class="{active: routeName == 'contact'}" href="#/contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+
+    </header>
+    
+
+
+
+    <div ng-view class="wrapper"></div>
+    
+
+    <footer class="main-footer">
+
+        <ul>
+            <li><a href="https://github.com/aamirshah" target="_blank" class="icon-github"></a></li>
+            <li><a href="http://in.linkedin.com/in/shahaamir" target="_blank" class="icon-linkedin"></a></li>
+            <li><a href="http://stackoverflow.com/users/1618540/aamir-shah" target="_blank" class="icon-stackoverflow"></a></li>
+            <li><a href="skype:aamir--shah?userinfo" class="icon-skype"></a></li>
+            <li><a href="https://twitter.com/cse_aamir" target="_blank" class="icon-twitter"></a></li>
+            <li><a href="https://facebook.com/cse.aamir" target="_blank" class="icon-facebook"></a></li>
+            <li><a href="mailto:cse.aamir@gmail.com" class="icon-gmail"></a></li>
+        </ul>
+            
+        <h6> &copy; Aamir Shah | 2014</h6>
+    </footer>
+
+    <script type="text/javascript" src="bower_components/_bower.js"></script>
+    <script type="text/javascript" src="js/all.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <!-- endbuild -->
+  </body>
+</html>
