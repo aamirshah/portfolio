@@ -52,7 +52,7 @@ var	settings = {
 		templates: 'build/templates/',
 		images: 'build/images/',
 		fonts: 'build/fonts/',
-		bower: 'build/bower_components/'
+		bower: 'build/js/'
 	},
 	scss: 'scss/'
 };
