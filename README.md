@@ -1,4 +1,4 @@
- aamir WebApp!
+ Aamir Shah's Portfolio!
 =====================
 
 ---------------
@@ -41,3 +41,14 @@ Finally, fire up the server
 
 ----------
 
+
+
+Deploying
+----------
+
+
+```
+git push heroku +HEAD:master
+git push -f heroku HEAD:master
+
+```
