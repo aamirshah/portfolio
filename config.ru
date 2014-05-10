@@ -16,7 +16,7 @@ map '/' do
 end
 
 
-map '/resume' do
+map '/resume.html' do
   run lambda { |env|
   [
     200, 
