@@ -15,12 +15,6 @@ header.main-header {
 		-moz-box-shadow: 0 3px 3px -3px gray;
 		box-shadow: 0 3px 3px -3px gray;
 
-		.left {
-			float: left;
-
-			h2 { text-indent: 22px; @include formatText(22px, 43px, lighter); }
-		}
-
 		.right {
 			float: right;
 
