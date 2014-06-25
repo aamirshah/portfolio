@@ -18,7 +18,7 @@
 			}
 
 			.inner-wrapper {
-				display: inline-block; padding-left: 17px; margin-top: 7px;
+				float: left; padding-left: 17px; margin-top: 7px;
 
 				h1 { @include formatText(22px, 22px, lighter); }
 				h6 { @include formatText(13px, 13px, lighter); }	
