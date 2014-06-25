@@ -65,7 +65,7 @@
 		.row {
 			margin-top: 30px;
 
-			&.last { margin-top: 100px; padding-bottom: 50px; }
+			&.last { margin-top: 80px; }
 
 			> div { float: left; }
 
@@ -172,6 +172,16 @@
 						i.icon-chrome { font-size: 32px; }
 					}
 				}
+			}
+
+			.project-timeline {
+				padding: 25px 5px 0 5px;
+
+				.right-arrow {
+					position: absolute; right: -3px; top: 0; bottom: 0; margin: auto;
+				}
+
+				.coding { position: absolute; top: 16px; left: 10px; }
 			}
 		}
 	}

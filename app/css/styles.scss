@@ -45,8 +45,7 @@ header.main-header {
 	border: 3px solid $boderColor; border-bottom: 2px solid $boderColor;
 	
 	.pic {
-		width: 200px; height: 200px; border-radius: 50%; background: url('../images/aamir-profile.jpg');		
-		background-size: cover; border: 2px solid $blue; margin: 20px auto 0 auto;	
+		width: 200px; height: 200px; border-radius: 50%; display: block; border: 2px solid $blue; margin: 20px auto 0 auto;	
 	}
 
 	.details {
