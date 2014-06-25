@@ -233,7 +233,7 @@ gulp.task('copy:html', function () {
 gulp.task('copy:html:root', function() {
 
 	console.log('-------------------------------------------------- COPY :html:root');
-	gulp.src(settings.src.app + '*.html')
+	gulp.src([settings.src.app + '*.html', settings.src.app + '*.xml'])
 		.pipe(gulpif(isProduction, minifyHTML({comments: false, quotes: true, spare:true, empty: true, cdata:true})))
 		.pipe(gulp.dest(settings.build.app))
 		.pipe(refresh(livereload));
@@ -274,7 +274,7 @@ gulp.task('watch', function () {
 
 	var jsFiles    = gulp.watch([settings.src.js + '*.js',    settings.src.js + '**/*.js'],    ['concat:js']);
 
-	var indexFile  = gulp.watch([settings.src.app + '*.html'], ['copy:html:root']);
+	var indexFile  = gulp.watch([settings.src.app + '*.html', settings.src.app + '*.xml'], ['copy:html:root']);
 
 	var imageFiles = gulp.watch([settings.src.images + '*.*', settings.src.images + '**/*.*'], ['copy:images']);
 
