@@ -27,6 +27,7 @@ map '/resume.html' do
     File.open('build/resume.html', File::RDONLY)
   ]
 }
+end
 
 map '/sitemap.xml' do
   run lambda { |env|
