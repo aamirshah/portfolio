@@ -1,41 +1,24 @@
 'use strict';
 
-var gutil      		= require('gulp-util'),
-	gulp       		= require('gulp'),
-	clean      		= require('gulp-clean'),
-	concat     		= require('gulp-concat'),
-	uglify     		= require('gulp-uglify'),
-	rename     		= require('gulp-rename'),
-	sass       		= require('gulp-sass'),
-	minifyCSS  		= require('gulp-minify-css'),
-	minifyHTML 		= require('gulp-minify-html'),
-	gzip       		= require('gulp-gzip'),
-	imagemin   		= require('gulp-imagemin'),
-	watch      		= require('gulp-watch'),
-	plumber    		= require('gulp-plumber'),
-	gulpif     		= require('gulp-if'),
-	jshint     		= require('gulp-jshint'),
-	stylish    		= require('jshint-stylish'),
-	path       		= require('path'),
-	connect    		= require('connect'),
-	http       		= require('http'),
-	open       		= require('open'),
-	refresh    		= require('gulp-livereload'),
-	tinylr     		= require('tiny-lr'),
-	livereload 		= tinylr(),
-	zip        		= require('gulp-zip'),
-	fs         		= require('fs'),
-	chalk      		= require('chalk'),
-	args       		= require('yargs').argv,
-	browserSync 	= require('browser-sync'),
-	runSequence 	= require('run-sequence'),
-	gulpFilter 		= require('gulp-filter'),
-	gulpBowerFiles 	= require('gulp-bower-files'),
-	map 			= require('map-stream');
+var gulp       = require('gulp'),
+	bowerFiles = require('main-bower-files'),
+	stylish    = require('jshint-stylish'),
+	path       = require('path'),
+	open       = require('open'),
+	fs         = require('fs'),
+	chalk      = require('chalk'),
+	args       = require('yargs').argv,
+	map        = require('map-stream'),
+	browserSync = require('browser-sync'),
+	runSequence = require('run-sequence'),
+	gulpPlugins = require('gulp-load-plugins')();
 
-var	settings = {
-	livereloadPort: 35729,
-	serverPort: 9000,
+// chalk config
+var errorLog  = chalk.red.bold,
+	hintLog   = chalk.blue,
+	changeLog = chalk.red;
+
+var	SETTINGS = {
 	src: {
 		app: 'app/',
 		css: 'app/css/',
@@ -52,9 +35,25 @@ var	settings = {
 		templates: 'build/templates/',
 		images: 'build/images/',
 		fonts: 'build/fonts/',
-		bower: 'build/js/'
+		bower: 'build/js/' // If you change this, you will have to change in index.html as well.
 	},
 	scss: 'scss/'
+};
+
+var bowerConfig = {
+	paths: {
+		bowerDirectory: SETTINGS.src.bower,
+		bowerrc: '.bowerrc',
+		bowerJson: 'bower.json'
+	}
+};
+
+//server and live reload config
+var serverConfig = {
+	root: 'build',
+	host: 'localhost',
+	port: 9000,
+	livereload: true
 };
 
 // jsHint Options.
@@ -63,37 +62,17 @@ var hintOptions = JSON.parse(fs.readFileSync('.jshintrc', 'utf8'));
 // Flag for generating production code.
 var isProduction = args.type === 'production';
 
-
 /*============================================================
  =                          Server (Live - Reload)            =
  ============================================================*/
 
-gulp.task('local:server', function () {
+gulp.task('server', function () {
 
-	var middleware = [
-			require('connect-livereload')({ port: settings.livereloadPort }),
-			connect.static(settings.build.app),
-			connect.directory(settings.build.app)
-		],
-
-		app = connect.apply(null, middleware),
-		server = http.createServer(app);
-		server
-			.listen(settings.serverPort)
-			.on('listening', function() {
-				console.log('Started connect web server on http://localhost:' + settings.serverPort + '.');
-				open('http://localhost:' + settings.serverPort);
-			});
-});
-
-gulp.task('tinylr', function () {
-	livereload.listen(settings.livereloadPort, function (err){
-		if (err) return console.log(err);
-	});
-});
-
-gulp.task('server', ['local:server', 'tinylr'], function () {
 	console.log('------------------>>>> firing server  <<<<-----------------------');
+	gulpPlugins.connect.server(serverConfig);
+	
+	console.log('Started connect web server on http://localhost:' + serverConfig.port + '.');
+	open('http://localhost:' + serverConfig.port);
 });
 
 
@@ -102,12 +81,12 @@ gulp.task('server', ['local:server', 'tinylr'], function () {
  =                          JS-HINT                          =
  ============================================================*/
 
-gulp.task('js:hint', function() {
+gulp.task('js:hint', function () {
 
 	console.log('-------------------------------------------------- JS - HINT');
-	var stream = gulp.src([settings.src.js + 'app.js', '!' + settings.src.js + 'libs/*.js', settings.src.js + '**/*.js'])
-		.pipe(jshint(hintOptions))
-		.pipe(jshint.reporter(stylish));
+	var stream = gulp.src([SETTINGS.src.js + 'app.js', '!' + SETTINGS.src.js + 'plugins/*.js', SETTINGS.src.js + '**/*.js', 'gulpfile.js'])
+		.pipe(gulpPlugins.jshint(hintOptions))
+		.pipe(gulpPlugins.jshint.reporter(stylish));
 	return stream;
 });
 
@@ -116,85 +95,90 @@ gulp.task('js:hint', function() {
  =                          Concat                           =
  ============================================================*/
 
+
 gulp.task('concat', ['concat:bower', 'concat:js', 'concat:css']);
 
-gulp.task('concat:bower', function() {
-	console.log('-------------------------------------------------- CONCAT :bower');
-	var jsFilter = gulpFilter('**/*.js'),
-		cssFilter = gulpFilter('**/*.css'),
-		assetsFilter = gulpFilter(['!**/*.js', '!**/*.css', '!**/*.scss']);
 
-	gulpBowerFiles()
+gulp.task('concat:bower', function () {
+	console.log('-------------------------------------------------- CONCAT :bower');
+
+	var jsFilter = gulpPlugins.filter('**/*.js'),
+		cssFilter = gulpPlugins.filter('**/*.css'),
+		assetsFilter = gulpPlugins.filter(['!**/*.js', '!**/*.css', '!**/*.scss']);
+
+	var stream = gulp.src(bowerFiles(bowerConfig), {base: SETTINGS.src.bower})
 		.pipe(jsFilter)
-		.pipe(concat('_bower.js'))
-		.pipe(gulpif(isProduction, uglify()))
-		.pipe(gulp.dest(settings.build.bower))
+		.pipe(gulpPlugins.concat('_bower.js'))
+		.pipe(gulpPlugins.if(isProduction, gulpPlugins.uglify()))
+		.pipe(gulp.dest(SETTINGS.build.bower))
 		.pipe(jsFilter.restore())
 		.pipe(cssFilter)
-		.pipe(sass())
-		.pipe(map(function(file, callback) {
-			var relativePath = path.dirname(path.relative(path.resolve(settings.src.bower), file.path));
+		.pipe(gulpPlugins.sass())
+		.pipe(map(function (file, callback) {
+			var relativePath = path.dirname(path.relative(path.resolve(SETTINGS.src.bower), file.path));
 
 			// CSS path resolving
 			// Taken from https://github.com/enyojs/enyo/blob/master/tools/minifier/minify.js
-			var contents = file.contents.toString().replace(/url\([^)]*\)/g, function(match) {
+			var contents = file.contents.toString().replace(/url\([^)]*\)/g, function (match) {
 				// find the url path, ignore quotes in url string
 				var matches = /url\s*\(\s*(('([^']*)')|("([^"]*)")|([^'"]*))\s*\)/.exec(match),
 					url = matches[3] || matches[5] || matches[6];
 
 				// Don't modify data and http(s) urls
 				if (/^data:/.test(url) || /^http(:?s)?:/.test(url)) {
-					return "url(" + url + ")";
+					return 'url(' + url + ')';
 				}
-				return "url(" + path.join(path.relative(settings.build.bower, settings.build.app), settings.build.bower, relativePath, url) + ")";
+				return 'url(' + path.join(path.relative(SETTINGS.build.bower, SETTINGS.build.app), SETTINGS.build.bower, relativePath, url) + ')';
 			});
 			file.contents = new Buffer(contents);
 
-			callback(null, file)
+			callback(null, file);
 		}))
-		.pipe(concat('_bower.css'))
-		.pipe(gulp.dest(settings.build.bower))
+		.pipe(gulpPlugins.concat('_bower.css'))
+		.pipe(gulp.dest(SETTINGS.build.bower))
 		.pipe(cssFilter.restore())
 		.pipe(assetsFilter)
-		.pipe(gulp.dest(settings.build.bower))
+		.pipe(gulp.dest(SETTINGS.build.bower))
 		.pipe(assetsFilter.restore())
-		.pipe(refresh(livereload));
+		.pipe(gulpPlugins.connect.reload());
+	return stream;
 });
 
 gulp.task('concat:js', ['js:hint'], function () {
 
 	console.log('-------------------------------------------------- CONCAT :js');
-	gulp.src([settings.src.js + 'libs/*.js', settings.src.js + 'app.js', settings.src.js + '*.js', settings.src.js + '**/*.js'])
-		.pipe(concat('all.js'))
-		// .pipe(gulpif(isProduction, rename('all.min.js')))
-		.pipe(gulpif(isProduction, uglify()))
-		.pipe(gulp.dest(settings.build.js))
-		.pipe(refresh(livereload));
-
-	gulp.run('js:hint');
+	gulp.src([SETTINGS.src.js + 'plugins/*.js', SETTINGS.src.js + 'app.js', SETTINGS.src.js + '*.js', SETTINGS.src.js + '**/*.js'])
+	    .pipe(gulpPlugins.concat('all.js'))
+	    .pipe(gulpPlugins.if(isProduction, gulpPlugins.uglify()))
+	    .pipe(gulp.dest(SETTINGS.build.js))
+	    .pipe(gulpPlugins.connect.reload());
 });
 
 gulp.task('convert:scss', function () {
 	console.log('-------------------------------------------------- COVERT - scss');
 
-	var stream = gulp.src(settings.src.css + 'application.scss')
-		.pipe(sass({includePaths: [settings.src.css]}))
-		.pipe(gulp.dest(settings.scss))
-		.pipe(refresh(livereload));
-	return stream;
+	// Callback to show sass error
+	var showError = function (err) {
+		console.log(errorLog('\n SASS file has error clear it to see changes, see below log ------------->>> \n'));
+		console.log(errorLog(err));
+	};
+
+    var stream = gulp.src(SETTINGS.src.css + 'application.scss')
+       .pipe(gulpPlugins.sass({includePaths: [SETTINGS.src.css], onError: showError}))
+       .pipe(gulp.dest(SETTINGS.scss))
+       .pipe(gulpPlugins.connect.reload());
+    return stream;
 });
 
 gulp.task('concat:css', ['convert:scss'], function () {
 
 	console.log('-------------------------------------------------- CONCAT :css ');
-	gulp.src([settings.src.css + 'reset.css', settings.src.css + 'fonts.css', settings.scss + 'application.css', settings.src.css + '*.css'])
-		.pipe(concat('styles.css'))
-		// .pipe(gulpif(isProduction, rename('styles.min.css')))
-		.pipe(gulpif(isProduction, minifyCSS({keepSpecialComments: '*'})))
-		.pipe(gulp.dest(settings.build.css))
-		.pipe(refresh(livereload));
+	gulp.src([SETTINGS.src.css + 'reset.css', SETTINGS.src.css + 'fonts.css', SETTINGS.scss + 'application.css', SETTINGS.src.css + '*.css'])
+	    .pipe(gulpPlugins.concat('styles.css'))
+	    .pipe(gulpPlugins.if(isProduction, gulpPlugins.minifyCss({keepSpecialComments: '*'})))
+	    .pipe(gulp.dest(SETTINGS.build.css))
+	    .pipe(gulpPlugins.connect.reload());
 });
-
 
 
 
@@ -206,10 +190,10 @@ gulp.task('concat:css', ['convert:scss'], function () {
 
 
 gulp.task('image:min', function () {
-	gulp.src(settings.src.images+'*.*')
-		.pipe(imagemin())
-		.pipe(gulp.dest(settings.build.images))
-		.pipe(refresh(livereload));
+	gulp.src(SETTINGS.src.images + '*.*')
+		.pipe(gulpPlugins.imagemin())
+		.pipe(gulp.dest(SETTINGS.build.images))
+		.pipe(gulpPlugins.connect.reload());
 });
 
 
@@ -218,39 +202,40 @@ gulp.task('image:min', function () {
  =                           Copy                            =
  ============================================================*/
 
+
 gulp.task('copy', ['copy:html', 'copy:images', 'copy:fonts', 'copy:html:root']);
 
 
 gulp.task('copy:html', function () {
-
+	
 	console.log('-------------------------------------------------- COPY :html');
-	gulp.src([settings.src.templates + '*.html', settings.src.templates + '**/*.html'])
-		.pipe(gulpif(isProduction, minifyHTML({comments: false, quotes: true, spare:true, empty: true, cdata:true})))
-		.pipe(gulp.dest(settings.build.templates))
-		.pipe(refresh(livereload));
+	gulp.src([SETTINGS.src.templates + '*.html', SETTINGS.src.templates + '**/*.html'])
+		.pipe(gulpPlugins.if(isProduction, gulpPlugins.minifyHtml({comments: false, quotes: true, spare: true, empty: true, cdata: true})))
+		.pipe(gulp.dest(SETTINGS.build.templates))
+		.pipe(gulpPlugins.connect.reload());
 });
 
-gulp.task('copy:html:root', function() {
-
+gulp.task('copy:html:root', function () {
+	
 	console.log('-------------------------------------------------- COPY :html:root');
-	gulp.src([settings.src.app + '*.html', settings.src.app + '*.xml'])
-		.pipe(gulpif(isProduction, minifyHTML({comments: false, quotes: true, spare:true, empty: true, cdata:true})))
-		.pipe(gulp.dest(settings.build.app))
-		.pipe(refresh(livereload));
+	gulp.src([SETTINGS.src.app + '*.html', SETTINGS.src.app + '*.xml'])
+		.pipe(gulpPlugins.if(isProduction, gulpPlugins.minifyHtml({comments: false, quotes: true, spare: true, empty: true, cdata: true})))
+		.pipe(gulp.dest(SETTINGS.build.app))
+		.pipe(gulpPlugins.connect.reload());
 });
 
-gulp.task('copy:images', function() {
+gulp.task('copy:images', function () {
 
 	console.log('-------------------------------------------------- COPY :images');
-	gulp.src([settings.src.images + '*.*', settings.src.images + '**/*.*'])
-		.pipe(gulp.dest(settings.build.images));
+	gulp.src([SETTINGS.src.images + '*.*', SETTINGS.src.images + '**/*.*'])
+		.pipe(gulp.dest(SETTINGS.build.images));
 });
 
-gulp.task('copy:fonts', function() {
+gulp.task('copy:fonts', function () {
 
 	console.log('-------------------------------------------------- COPY :fonts');
-	gulp.src([settings.src.fonts + '*', settings.src.fonts + '**/*'])
-		.pipe(gulp.dest(settings.build.fonts));
+	gulp.src([SETTINGS.src.fonts + '*', SETTINGS.src.fonts + '**/*'])
+		.pipe(gulp.dest(SETTINGS.build.fonts));
 });
 
 
@@ -264,100 +249,95 @@ gulp.task('copy:fonts', function() {
  $ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
  =========================================================================================================*/
 
-gulp.task('watch', function () {
 
+/*=========================================================================================================
+=												Watch
+
+	Incase the watch fails due to limited number of watches available on your sysmtem, the execute this
+	command on terminal
+
+	$ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+=========================================================================================================*/
+	
+gulp.task('watch', function () {
+	
 	console.log('watching all the files.....');
 
-	var cssFiles   = gulp.watch([settings.src.css + '*.css',  settings.src.css + '**/*.css'],  ['concat:css']);
+	var watchedFiles = [];
 
-	var scssFiles  = gulp.watch([settings.src.css + '*.scss', settings.src.css + '**/*.scss'], ['concat:css']);
+	watchedFiles.push(gulp.watch([SETTINGS.src.css + '*.css',  SETTINGS.src.css + '**/*.css'],  ['concat:css']));
+	
+	watchedFiles.push(gulp.watch([SETTINGS.src.css + '*.scss', SETTINGS.src.css + '**/*.scss'], ['concat:css']));
 
-	var jsFiles    = gulp.watch([settings.src.js + '*.js',    settings.src.js + '**/*.js'],    ['concat:js']);
+    watchedFiles.push(gulp.watch([SETTINGS.src.js + '*.js',    SETTINGS.src.js + '**/*.js'],    ['concat:js']));
 
-	var indexFile  = gulp.watch([settings.src.app + '*.html', settings.src.app + '*.xml'], ['copy:html:root']);
+    watchedFiles.push(gulp.watch([SETTINGS.src.app + '*.html', SETTINGS.src.app + '*.xml'], ['copy:html:root']));
 
-	var imageFiles = gulp.watch([settings.src.images + '*.*', settings.src.images + '**/*.*'], ['copy:images']);
+	watchedFiles.push(gulp.watch([SETTINGS.src.images + '*.*', SETTINGS.src.images + '**/*.*'], ['copy:images']));
 
-	var fontFiles  = gulp.watch([settings.src.fonts + '*.*',  settings.src.fonts + '**/*.*'],  ['copy:fonts']);
+	watchedFiles.push(gulp.watch([SETTINGS.src.fonts + '*.*',  SETTINGS.src.fonts + '**/*.*'],  ['copy:fonts']));
 
-	var libFiles   = gulp.watch([settings.src.bower + '*.js', settings.src.bower + '**/*.js', 'bower.json'], ['concat:bower']);
+	watchedFiles.push(gulp.watch([SETTINGS.src.bower + '*.js', SETTINGS.src.bower + '**/*.js'], ['concat:bower']));
 
-	var templateFiles = gulp.watch([settings.src.templates + '*.html', settings.src.templates + '**/*.html'], ['copy:html']);
+	watchedFiles.push(gulp.watch([SETTINGS.src.templates + '*.html', SETTINGS.src.templates + '**/*.html'], ['copy:html']));
 
 
 	// Just to add log messages on Terminal, in case any file is changed
-	var printLogMsg = function (event) {
-		console.log(chalk.red('-------------------------------------------------->>>> File ' + event.path + ' was ------->>>> ' + event.type));
+	var onChange = function (event) {
+		if (event.type === 'deleted') {
+			runSequence('clean');
+			setTimeout(function () {
+				runSequence('copy', 'concat', 'watch');
+			}, 500);
+		}
+		console.log(changeLog('-------------------------------------------------->>>> File ' + event.path + ' was ------->>>> ' + event.type));
 	};
 
-	cssFiles.on     ('change', printLogMsg);
-	scssFiles.on    ('change', printLogMsg);
-	jsFiles.on      ('change', printLogMsg);
-	indexFile.on    ('change', printLogMsg);
-	imageFiles.on   ('change', printLogMsg);
-	fontFiles.on    ('change', printLogMsg);
-	libFiles.on     ('change', printLogMsg);
-	templateFiles.on('change', printLogMsg);
+	watchedFiles.forEach(function (watchedFile) {
+		watchedFile.on('change', onChange);
+	});
+	
 });
+
+
 
 
 /*============================================================
  =                             Clean                          =
  ============================================================*/
 
-gulp.task('clean', function () {
+var cleanFiles = function (files, logMessage) {
+	console.log('-------------------------------------------------- CLEAN :' + logMessage);
+	gulp.src(files, {read: false})
+		.pipe(gulpPlugins.rimraf({force: true}));
+};
 
-	// gulp.run('clean:css', 'clean:js', 'clean:html', 'clean:images', 'clean:fonts');
-	gulp.src([settings.build.app], {read: false})
-		.pipe(clean({force: true}));
+gulp.task('clean', function () {
+	cleanFiles([SETTINGS.build.app], 'all files');
 });
 
 gulp.task('clean:css', function () {
-
-	console.log('-------------------------------------------------- CLEAN :css');
-	gulp.src([settings.build.css], {read: false})
-		.pipe(clean({force: true}));
+	cleanFiles([SETTINGS.build.css], 'css');
 });
 
 gulp.task('clean:js', function () {
-
-	console.log('-------------------------------------------------- CLEAN :js');
-	gulp.src([settings.build.js], {read: false})
-		.pipe(clean({force: true}));
-});
-
-gulp.task('clean:bower', function() {
-	console.log('-------------------------------------------------- CLEAN :lib');
-	gulp.src([settings.build.lib], {read: false})
-		.pipe(clean({force: true}));
+	cleanFiles([SETTINGS.build.js], 'js');
 });
 
 gulp.task('clean:html', function () {
-
-	console.log('-------------------------------------------------- CLEAN :html');
-	gulp.src([settings.build.templates], {read: false})
-		.pipe(clean({force: true}));
+	cleanFiles([SETTINGS.build.templates], 'html');
 });
 
 gulp.task('clean:images', function () {
-
-	console.log('-------------------------------------------------- CLEAN :images');
-	gulp.src([settings.build.images], {read: false})
-		.pipe(clean({force: true}));
+	cleanFiles([SETTINGS.build.images], 'images');
 });
 
 gulp.task('clean:fonts', function () {
-
-	console.log('-------------------------------------------------- CLEAN :fonts');
-	gulp.src([settings.build.fonts+'*.*', settings.build.fonts+'**/*.*'], {read: false})
-		.pipe(clean({force: true}));
+	cleanFiles([SETTINGS.build.fonts + '*.*', SETTINGS.build.fonts + '**/*.*'], 'fonts');
 });
 
 gulp.task('clean:zip', function () {
-
-	console.log('-------------------------------------------------- CLEAN :Zip');
-	gulp.src(['zip/**/*', '!zip/build-*.zip'], {read: false})
-		.pipe(clean({force: true}));
+	cleanFiles(['zip/**/*', '!zip/build-*.zip'], 'zip');
 });
 
 
@@ -366,14 +346,14 @@ gulp.task('clean:zip', function () {
  ============================================================*/
 
 gulp.task('zip', function () {
-	gulp.src([settings.build.app + '*', settings.build.app + '**/*'])
-		.pipe(zip('build-' + new Date() + '.zip'))
-		.pipe(gulp.dest('./zip/'));
+    gulp.src([SETTINGS.build.app + '*', SETTINGS.build.app + '**/*'])
+        .pipe(gulpPlugins.zip('build-' + new Date() + '.zip'))
+        .pipe(gulp.dest('./zip/'));
 
-	setTimeout(function(){
-		gulp.run('clean:zip');
-	}, 500); // wait for file creation
-
+    setTimeout(function () {
+		runSequence('clean:zip');
+    }, 500); // wait for file creation
+	    
 });
 
 
@@ -383,18 +363,18 @@ gulp.task('zip', function () {
  ============================================================*/
 
 
-gulp.task('build', function(){
-	console.log(chalk.blue('-------------------------------------------------- BUILD - Development Mode'));
+gulp.task('build', function () {
+	console.log(hintLog('-------------------------------------------------- BUILD - Development Mode'));
 	runSequence('copy', 'concat', 'watch');
 });
 
-gulp.task('build:prod', function(){
-	console.log(chalk.blue('-------------------------------------------------- BUILD - Production Mode'));
+gulp.task('build:prod', function () {
+	console.log(hintLog('-------------------------------------------------- BUILD - Production Mode'));
 	isProduction = true;
 	runSequence('copy', 'concat', 'watch');
 });
 
-gulp.task('default', [ 'build', 'server']);
+gulp.task('default', ['build', 'server']);
 
 // Just in case you are too lazy to type: $ gulp --type production
 gulp.task('prod', ['build:prod', 'server']);
@@ -404,13 +384,11 @@ gulp.task('prod', ['build:prod', 'server']);
  =                       Browser Sync                         =
  ============================================================*/
 
-gulp.task('sync', function() {
-	browserSync.init([settings.build.app + 'index.html', settings.build + 'templates/*.html', settings.build.css + '*.css', settings.build.js + '*.js'], {
+gulp.task('bs', function () {
+    browserSync.init([SETTINGS.build.app + 'index.html', SETTINGS.build + 'templates/*.html', SETTINGS.build.css + '*css', SETTINGS.build.js + '*.js'], {
 		proxy: {
-			host: '127.0.0.1',
-			port: settings.serverPort
-		}
-	});
+            host: '127.0.0.1',
+            port: serverConfig.port
+        }
+    });
 });
-
-
