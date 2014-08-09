@@ -41,3 +41,17 @@ map '/sitemap.xml' do
   ]
 }
 end
+
+
+map '/fk' do
+  run lambda { |env|
+  [
+    200, 
+    {
+      'Content-Type'  => 'text/html', 
+      'Cache-Control' => 'public, max-age=86400' 
+    },
+    File.open('build/fk.html', File::RDONLY)
+  ]
+}
+end
